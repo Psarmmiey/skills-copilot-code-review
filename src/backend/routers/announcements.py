@@ -143,7 +143,7 @@ def update_announcement(
         # Validate ObjectId
         try:
             obj_id = ObjectId(announcement_id)
-        except:
+        except Exception:
             raise HTTPException(status_code=400, detail="Invalid announcement ID")
         
         # Validate dates
@@ -191,7 +191,7 @@ def delete_announcement(announcement_id: str, teacher_username: str) -> Dict[str
         # Validate ObjectId
         try:
             obj_id = ObjectId(announcement_id)
-        except:
+        except Exception:
             raise HTTPException(status_code=400, detail="Invalid announcement ID")
         
         # Delete announcement
@@ -221,7 +221,7 @@ def toggle_announcement_status(announcement_id: str, teacher_username: str) -> D
         # Validate ObjectId
         try:
             obj_id = ObjectId(announcement_id)
-        except:
+        except Exception:
             raise HTTPException(status_code=400, detail="Invalid announcement ID")
         
         # Get current announcement
