@@ -20,6 +20,25 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+def validate_object_id(id_string: str) -> ObjectId:
+    """
+    Validate and convert a string to ObjectId.
+    
+    Args:
+        id_string: The string representation of an ObjectId
+        
+    Returns:
+        ObjectId: The validated ObjectId
+        
+    Raises:
+        HTTPException: If the ID format is invalid
+    """
+    try:
+        return ObjectId(id_string)
+    except:
+        raise HTTPException(status_code=400, detail="Invalid announcement ID")
+
+
 @router.get("/active")
 def get_active_announcements() -> List[Dict[str, Any]]:
     """Get all active announcements that should be displayed now"""
@@ -141,10 +160,7 @@ def update_announcement(
             raise HTTPException(status_code=401, detail="Authentication required")
         
         # Validate ObjectId
-        try:
-            obj_id = ObjectId(announcement_id)
-        except:
-            raise HTTPException(status_code=400, detail="Invalid announcement ID")
+        obj_id = validate_object_id(announcement_id)
         
         # Validate dates
         try:
@@ -189,10 +205,7 @@ def delete_announcement(announcement_id: str, teacher_username: str) -> Dict[str
             raise HTTPException(status_code=401, detail="Authentication required")
         
         # Validate ObjectId
-        try:
-            obj_id = ObjectId(announcement_id)
-        except:
-            raise HTTPException(status_code=400, detail="Invalid announcement ID")
+        obj_id = validate_object_id(announcement_id)
         
         # Delete announcement
         result = announcements_collection.delete_one({"_id": obj_id})
@@ -219,10 +232,7 @@ def toggle_announcement_status(announcement_id: str, teacher_username: str) -> D
             raise HTTPException(status_code=401, detail="Authentication required")
         
         # Validate ObjectId
-        try:
-            obj_id = ObjectId(announcement_id)
-        except:
-            raise HTTPException(status_code=400, detail="Invalid announcement ID")
+        obj_id = validate_object_id(announcement_id)
         
         # Get current announcement
         announcement = announcements_collection.find_one({"_id": obj_id})
