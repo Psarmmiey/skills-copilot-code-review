@@ -43,6 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const announcementEndDate = document.getElementById("announcement-end-date");
   const cancelAnnouncement = document.getElementById("cancel-announcement");
   const editingAnnouncementId = document.getElementById("editing-announcement-id");
+  const editingAnnouncementActive = document.getElementById("editing-announcement-active");
 
   // Activity categories with corresponding colors
   const activityTypes = {
@@ -1048,6 +1049,7 @@ document.addEventListener("DOMContentLoaded", () => {
         new Date(announcement.start_date).toISOString().slice(0, 16) : '';
       announcementEndDate.value = new Date(announcement.end_date).toISOString().slice(0, 16);
       editingAnnouncementId.value = announcementId;
+      editingAnnouncementActive.value = announcement.active ? 'true' : 'false';
       
       // Update form title
       announcementFormTitle.textContent = "Edit Announcement";
@@ -1150,6 +1152,7 @@ document.addEventListener("DOMContentLoaded", () => {
       announcementFormModal.classList.add("hidden");
       announcementForm.reset();
       editingAnnouncementId.value = "";
+      editingAnnouncementActive.value = "true";
       announcementFormTitle.textContent = "Add New Announcement";
     }, 300);
   }
@@ -1207,6 +1210,11 @@ document.addEventListener("DOMContentLoaded", () => {
       
       if (startDate) {
         params.append('start_date', startDate);
+      }
+      
+      // Include active status when updating
+      if (announcementId) {
+        params.append('active', editingAnnouncementActive.value);
       }
 
       const response = await fetch(`${url}?${params}`, { method });
