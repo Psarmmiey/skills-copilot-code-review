@@ -665,6 +665,7 @@ footer {
   background-color: rgba(255, 255, 255, 0.3);
 }
 
+/* Announcement banners */
 .announcement-banner {
   background-color: #256029; /* Darker green for better contrast */
   color: white;
@@ -672,4 +673,270 @@ footer {
   padding: 15px;
   font-weight: bold;
   text-shadow: 0 1px 2px rgba(0,0,0,0.15); /* Optional: subtle shadow for readability */
+  margin-bottom: 0;
+  position: relative;
+}
+
+.announcement-banner + .announcement-banner {
+  margin-top: -1px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+#announcements-container:empty {
+  display: none;
+}
+
+/* Announcement Management Styles */
+#manage-announcements {
+  background: none;
+  border: 1px solid #ddd;
+  color: #333;
+  margin-left: 10px;
+}
+
+#manage-announcements:hover {
+  background-color: #f5f5f5;
+  color: #007bff;
+}
+
+.large-modal .modal-content {
+  width: 95%;
+  max-width: 800px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.announcements-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.primary-btn {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.primary-btn:hover {
+  background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.announcements-list {
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.announcement-item {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.announcement-item:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-color: #007bff;
+}
+
+.announcement-item.inactive {
+  opacity: 0.6;
+  background: #f8f9fa;
+}
+
+.announcement-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.announcement-message {
+  flex: 1;
+  font-weight: 500;
+  color: #333;
+  margin-right: 15px;
+  line-height: 1.4;
+}
+
+.announcement-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.announcement-btn {
+  background: none;
+  border: 1px solid #ddd;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+.announcement-btn.edit-btn {
+  color: #007bff;
+  border-color: #007bff;
+}
+
+.announcement-btn.edit-btn:hover {
+  background: #007bff;
+  color: white;
+}
+
+.announcement-btn.delete-btn {
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+.announcement-btn.delete-btn:hover {
+  background: #dc3545;
+  color: white;
+}
+
+.announcement-btn.toggle-btn {
+  color: #28a745;
+  border-color: #28a745;
+}
+
+.announcement-btn.toggle-btn:hover {
+  background: #28a745;
+  color: white;
+}
+
+.announcement-btn.toggle-btn.inactive {
+  color: #6c757d;
+  border-color: #6c757d;
+}
+
+.announcement-btn.toggle-btn.inactive:hover {
+  background: #6c757d;
+  color: white;
+}
+
+.announcement-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+  font-size: 12px;
+  color: #666;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-label {
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 2px;
+}
+
+.detail-value {
+  color: #666;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.status-badge.active {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-badge.inactive {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* Form styles for announcement editing */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.form-help {
+  font-size: 11px;
+  color: #6c757d;
+  margin-top: 5px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #f0f0f0;
+}
+
+#cancel-announcement {
+  background: #f8f9fa;
+  color: #6c757d;
+  border: 1px solid #dee2e6;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#cancel-announcement:hover {
+  background: #e9ecef;
+  color: #495057;
+}
+
+textarea#announcement-message {
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .large-modal .modal-content {
+    width: 95%;
+    margin: 20px auto;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .announcement-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .announcement-actions {
+    align-self: flex-start;
+  }
+  
+  .announcements-actions {
+    justify-content: center;
+  }
 }
