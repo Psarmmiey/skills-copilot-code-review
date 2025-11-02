@@ -23,6 +23,7 @@ logger = logging.getLogger(__name__)
 def verify_teacher_auth(teacher_username: str) -> Dict[str, Any]:
     """
     Dependency function to verify teacher authentication.
+    Automatically extracts teacher_username from query parameters.
     Raises HTTPException if teacher is not authenticated.
     Returns the teacher document if authenticated.
     """
