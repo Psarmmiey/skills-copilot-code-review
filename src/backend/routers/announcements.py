@@ -236,6 +236,9 @@ def toggle_announcement_status(announcement_id: str, teacher_username: str) -> D
             {"$set": {"active": new_status}}
         )
         
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Announcement not found")
+        
         status_text = "activated" if new_status else "deactivated"
         logger.info(f"Announcement {announcement_id} {status_text} by {teacher_username}")
         
