@@ -2,7 +2,7 @@
 Announcements endpoints for the High School Management System API
 """
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from typing import Dict, Any, List, Optional
 from datetime import datetime
 from bson import ObjectId
@@ -18,6 +18,19 @@ router = APIRouter(
 # Configure logging to only log on server
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+def verify_teacher_auth(teacher_username: str) -> Dict[str, Any]:
+    """
+    Dependency function to verify teacher authentication.
+    Automatically extracts teacher_username from query parameters.
+    Raises HTTPException if teacher is not authenticated.
+    Returns the teacher document if authenticated.
+    """
+    teacher = teachers_collection.find_one({"_id": teacher_username})
+    if not teacher:
+        raise HTTPException(status_code=401, detail="Authentication required")
+    return teacher
 
 
 @router.get("/active")
@@ -51,14 +64,9 @@ def get_active_announcements() -> List[Dict[str, Any]]:
 
 
 @router.get("/all")
-def get_all_announcements(teacher_username: str) -> List[Dict[str, Any]]:
+def get_all_announcements(teacher: Dict[str, Any] = Depends(verify_teacher_auth)) -> List[Dict[str, Any]]:
     """Get all announcements for management (requires teacher authentication)"""
     try:
-        # Verify teacher exists and is authenticated
-        teacher = teachers_collection.find_one({"_id": teacher_username})
-        if not teacher:
-            raise HTTPException(status_code=401, detail="Authentication required")
-        
         # Get all announcements
         announcements = list(announcements_collection.find({}).sort("created_at", -1))
         
@@ -79,16 +87,11 @@ def get_all_announcements(teacher_username: str) -> List[Dict[str, Any]]:
 def create_announcement(
     message: str,
     end_date: str,
-    teacher_username: str,
-    start_date: Optional[str] = None
+    start_date: Optional[str] = None,
+    teacher: Dict[str, Any] = Depends(verify_teacher_auth)
 ) -> Dict[str, Any]:
     """Create a new announcement"""
     try:
-        # Verify teacher exists and is authenticated
-        teacher = teachers_collection.find_one({"_id": teacher_username})
-        if not teacher:
-            raise HTTPException(status_code=401, detail="Authentication required")
-        
         # Validate dates
         try:
             datetime.fromisoformat(end_date.replace('Z', '+00:00'))
@@ -102,7 +105,7 @@ def create_announcement(
             "message": message.strip(),
             "start_date": start_date,
             "end_date": end_date,
-            "created_by": teacher_username,
+            "created_by": teacher["_id"],
             "created_at": datetime.now().isoformat(),
             "active": True
         }
@@ -112,7 +115,7 @@ def create_announcement(
         # Return the created announcement
         announcement_doc["_id"] = str(result.inserted_id)
         
-        logger.info(f"Announcement created by {teacher_username}")
+        logger.info(f"Announcement created by {teacher['_id']}")
         return {
             "message": "Announcement created successfully",
             "announcement": announcement_doc
@@ -129,17 +132,12 @@ def update_announcement(
     announcement_id: str,
     message: str,
     end_date: str,
-    teacher_username: str,
     start_date: Optional[str] = None,
-    active: bool = True
+    active: bool = True,
+    teacher: Dict[str, Any] = Depends(verify_teacher_auth)
 ) -> Dict[str, Any]:
     """Update an existing announcement"""
     try:
-        # Verify teacher exists and is authenticated
-        teacher = teachers_collection.find_one({"_id": teacher_username})
-        if not teacher:
-            raise HTTPException(status_code=401, detail="Authentication required")
-        
         # Validate ObjectId
         try:
             obj_id = ObjectId(announcement_id)
@@ -170,7 +168,7 @@ def update_announcement(
         if result.matched_count == 0:
             raise HTTPException(status_code=404, detail="Announcement not found")
         
-        logger.info(f"Announcement {announcement_id} updated by {teacher_username}")
+        logger.info(f"Announcement {announcement_id} updated by {teacher['_id']}")
         return {"message": "Announcement updated successfully"}
     except HTTPException:
         raise
@@ -180,14 +178,12 @@ def update_announcement(
 
 
 @router.delete("/delete/{announcement_id}")
-def delete_announcement(announcement_id: str, teacher_username: str) -> Dict[str, Any]:
+def delete_announcement(
+    announcement_id: str,
+    teacher: Dict[str, Any] = Depends(verify_teacher_auth)
+) -> Dict[str, Any]:
     """Delete an announcement"""
     try:
-        # Verify teacher exists and is authenticated
-        teacher = teachers_collection.find_one({"_id": teacher_username})
-        if not teacher:
-            raise HTTPException(status_code=401, detail="Authentication required")
-        
         # Validate ObjectId
         try:
             obj_id = ObjectId(announcement_id)
@@ -200,7 +196,7 @@ def delete_announcement(announcement_id: str, teacher_username: str) -> Dict[str
         if result.deleted_count == 0:
             raise HTTPException(status_code=404, detail="Announcement not found")
         
-        logger.info(f"Announcement {announcement_id} deleted by {teacher_username}")
+        logger.info(f"Announcement {announcement_id} deleted by {teacher['_id']}")
         return {"message": "Announcement deleted successfully"}
     except HTTPException:
         raise
@@ -210,14 +206,12 @@ def delete_announcement(announcement_id: str, teacher_username: str) -> Dict[str
 
 
 @router.put("/toggle/{announcement_id}")
-def toggle_announcement_status(announcement_id: str, teacher_username: str) -> Dict[str, Any]:
+def toggle_announcement_status(
+    announcement_id: str,
+    teacher: Dict[str, Any] = Depends(verify_teacher_auth)
+) -> Dict[str, Any]:
     """Toggle the active status of an announcement"""
     try:
-        # Verify teacher exists and is authenticated
-        teacher = teachers_collection.find_one({"_id": teacher_username})
-        if not teacher:
-            raise HTTPException(status_code=401, detail="Authentication required")
-        
         # Validate ObjectId
         try:
             obj_id = ObjectId(announcement_id)
@@ -237,7 +231,7 @@ def toggle_announcement_status(announcement_id: str, teacher_username: str) -> D
         )
         
         status_text = "activated" if new_status else "deactivated"
-        logger.info(f"Announcement {announcement_id} {status_text} by {teacher_username}")
+        logger.info(f"Announcement {announcement_id} {status_text} by {teacher['_id']}")
         
         return {
             "message": f"Announcement {status_text} successfully",
